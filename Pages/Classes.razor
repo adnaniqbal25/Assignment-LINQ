@@ -1,0 +1,122 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using Assignment.Model
+@page "/"
+<h3>Classes</h3>
+
+@code {
+    public AppDbContext Context = new AppDbContext(new DbContextOptions<AppDbContext>());
+    private Enrollment Enrollment = new Enrollment();
+    private Student student = new Student();
+
+    public List<Student> GetStudents()
+    {
+        var studentsList = Context.Enrollment
+         .Include(s => s.Student)
+         .Include(e => e.Class)
+         .ThenInclude(c => c.Faculty)
+         .Where(s => s.Class.Faculty.deptid != 22)
+         .Select(s => new Student {
+            sid=s.sid,
+            major=s.Student.major
+         })
+         .ToList();
+        return studentsList;
+    }
+
+    public void asd()
+    {
+        // for (int i = 0; i < 100; i++)
+        // {
+        //     Context.Student.Add(new Student
+        //         {
+        //             sname = "Zeeshan " + i,
+        //             standing = "Good",
+        //             major = "SE"
+        //         });
+        //     Context.Student.Add(new Student
+        //         {
+        //             sname = "xyz" + i,
+        //             standing = "Very Good",
+        //             major = "IT"
+        //         });
+
+        // }
+
+        // Context.SaveChanges();
+        foreach (var item in Context.Student.ToList())
+        {
+
+            Context.Enrollment.Add(new Enrollment
+                {
+                    sid = item.sid,
+                    cid = 3
+                });
+        }
+
+        Context.SaveChanges();
+
+
+        var s = Context.Class
+        .Include(x => x.Enrollments)
+        .Where(w => w.Enrollments.Count > 100)
+        .ToList();
+
+
+        // Context.Enrollment.
+    }
+  
+    protected override void OnInitialized()
+    {
+        // var s= Context.Enrollment
+        // .Include(s => s.cid)
+        //  .Select(s => new { s.cid, s.sid })
+        //  .ToList()
+        //  ;
+        // Console.WriteLine(s);
+        //asd();
+
+        //Question 2
+       
+
+
+        // var studentsListQ3 = Context.Student
+        // .Join(Context.Enrollment,
+        // x=>x.sid,
+        // y=>y.eid,
+        // (x, y) => new
+        // {
+        //   x.  
+        // }
+        // );
+        // var studentsListQ3 = Context.Student
+        // .Include(x=>x.Enrollment)
+        // .ToList();
+
+
+        var studentsListY3 = Context.Student
+       .Include(x => x.Enrollments)
+       .Where(x=>x.Enrollments == null)
+       .ToList();
+
+        var studentsListY5 = Context.Student
+      .Include(x => x.Enrollments)
+      .Where(x => x.Enrollments.Count>2)
+
+      .Select(x=>new {x.sname,x.Enrollments.Count})
+      .ToList();
+
+        var studentsListY6 = Context.Faculty
+        .Include(x => x.Class)
+        .Select(x=>new{x.fname,x.Class.Count})
+        .OrderByDescending(x=>x.Class.Count)
+       
+
+        .ToList();
+
+        //Context.Enrollment
+        //.Include((s) => s.cid)
+
+        //.Where(grp => grp.Class.Count() > 100)
+        //.ToList();
+    }
+}
